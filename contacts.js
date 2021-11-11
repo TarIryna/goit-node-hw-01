@@ -7,7 +7,7 @@ const contactsPath = path.resolve("./db/contacts.json");
 async function listContacts() {
   try {
     const data = await fs.readFile(contactsPath, "utf8");
-    const contacts = await JSON.parse(data);
+    const contacts = JSON.parse(data);
     console.log(contacts);
     return contacts;
   } catch (error) {
@@ -18,8 +18,8 @@ async function listContacts() {
 async function getContactById(contactId) {
   try {
     const data = await fs.readFile(contactsPath, "utf8");
-    const contacts = await JSON.parse(data);
-    const contactById = await contacts.filter(({ id }) => id === contactId);
+    const contacts = JSON.parse(data);
+    const contactById = contacts.find(({ id }) => id === contactId);
     console.log(contactById);
     return contactById;
   } catch (error) {
@@ -30,41 +30,40 @@ async function getContactById(contactId) {
 async function removeContact(contactId) {
   try {
     const data = await fs.readFile(contactsPath, "utf8");
-    const contacts = await JSON.parse(data);
-    const newListOfContacts = await contacts.filter(
+    const contacts = JSON.parse(data);
+    const newListOfContacts = contacts.filter(
       (contact) => contact.id !== contactId
     );
     const content = JSON.stringify(newListOfContacts);
     await fs.writeFile(contactsPath, content);
-    console.log(listContacts());
+    console.log(newListOfContacts);
   } catch (error) {
     console.log(error);
   }
 }
 
 async function addContact(name, email, phone) {
-  try {
-    const data = await fs.readFile(contactsPath, "utf8");
-    const contacts = await JSON.parse(data);
-    const newContact = {
-      id: shortid.generate(),
-      name: name,
-      email: email,
-      phone: phone,
-    };
-    const newListOfContacts = [...contacts, newContact];
-    const content = JSON.stringify(newListOfContacts);
-    console.log(listContacts());
-    await fs.writeFile(contactsPath, content);
-  } catch (error) {
-    console.log(error);
+  if (name && email && phone) {
+    try {
+      const data = await fs.readFile(contactsPath, "utf8");
+      const contacts = JSON.parse(data);
+      const newContact = {
+        id: shortid.generate(),
+        name: name,
+        email: email,
+        phone: phone,
+      };
+      const newListOfContacts = [...contacts, newContact];
+      const content = JSON.stringify(newListOfContacts);
+      console.log(newListOfContacts);
+      await fs.writeFile(contactsPath, content);
+    } catch (error) {
+      console.log(error);
+    }
   }
+  console.log("All required fields are empty!");
 }
 
-// listContacts();
-// getContactById(2);
-// removeContact(3);
-// addContact("Maryna", "maryna@mail.com", "0505050555");
 module.exports = {
   addContact,
   removeContact,
